@@ -1,9 +1,11 @@
 package scat
 
 type Config struct {
-	AbillsDB   string      `toml:"db"`
-	NasKeyFile string      `toml:"keyfile"`
-	Nases      []ConfigNas `toml:"nases"`
+	AbillsDB      string      `toml:"db"`
+	AbillsBDNames string      `toml:"dbnames"`
+	NasKeyFile    string      `toml:"keyfile"`
+	Nases         []ConfigNas `toml:"nases"`
+	SyncSpeed     bool        `toml:"-" flag:"syncspeed"`
 }
 
 type ConfigNas struct {
