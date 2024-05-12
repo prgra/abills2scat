@@ -140,7 +140,7 @@ type ScatUser struct {
 	KV     map[string]string
 }
 
-// fdpi_ctrl list all --policing показывает список пользователей и их скорости
+// GetUserProfilesList fdpi_ctrl list all --policing показывает список пользователей и их скорости
 func (n *Nas) GetUserProfilesList() (users []ScatUser, err error) {
 	s, serr := n.SSH.NewSession()
 	if serr != nil {
