@@ -84,9 +84,11 @@ func main() {
 				_ = id
 			}
 			// fmt.Println("DEBUG", id, prfmap[fmt.Sprintf("UID.%s", id)], prfmap[fmt.Sprintf("UID.%s", id)].TPName, fmt.Sprintf("tssp.%d", u.TPID))
-			if _, ok := prfmap[fmt.Sprintf("UID.%s", id)]; ok {
-				if prfmap[fmt.Sprintf("UID.%s", id)].TPName != fmt.Sprintf("tp.%d", u.TPID) {
-					app.Nases[i].Run(fmt.Sprintf("fdpi_ctrl load --policing --profile.name tp.%d --login UID.%s", u.TPID, u.UID))
+			pr, ok := prfmap[fmt.Sprintf("UID.%s", id)]
+			if (ok && pr.TPName != fmt.Sprintf("tp.%d", u.TPID)) || !ok {
+				_, err = app.Nases[i].Run(fmt.Sprintf("fdpi_ctrl load --policing --profile.name tp.%d --login UID.%s", u.TPID, u.UID))
+				if err != nil {
+					log.Print("Failed to parse output: " + err.Error())
 				}
 			}
 		}
