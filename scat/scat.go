@@ -26,11 +26,8 @@ type Abills struct {
 }
 
 type Nas struct {
-	Host   string
-	SSH    *ssh.Client
-	STDIN  io.WriteCloser
-	STDOUT io.Reader
-	STDERR io.Reader
+	Host string
+	SSH  *ssh.Client
 }
 
 func NewApp(conf Config) (*App, error) {
