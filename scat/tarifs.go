@@ -65,48 +65,24 @@ func (a *App) GetTarifsFromAbills() (tarifs []TariffProfile, err error) {
 			Type: "HTB",
 			Name: fmt.Sprintf("tp.%d", tps[i].ID),
 			Outbound: TariffSubClass{
-				RootRate: fmt.Sprintf("%dmbit", tps[i].OutSpeed/1000),
-				RootCeil: fmt.Sprintf("%dmbit", tps[i].OutSpeed/1000),
-				Classes: []TariffRootClass{
-					{
-						Class: 0,
-						Rate:  "8bit",
-						Ceil:  fmt.Sprintf("%dmbit", tps[i].OutSpeed/1000),
-					},
-					{
-						Class: 1,
-						Rate:  "8bit",
-						Ceil:  fmt.Sprintf("%dmbit", tps[i].OutSpeed/1000),
-					},
-				},
+				RootRate: fmt.Sprintf("%dkbit", tps[i].OutSpeed),
+				RootCeil: fmt.Sprintf("%dkbit", tps[i].OutSpeed),
 			},
 			Inbound: TariffSubClass{
-				RootRate: fmt.Sprintf("%dmbit", tps[i].InSpeed/1000),
-				RootCeil: fmt.Sprintf("%dmbit", tps[i].InSpeed/1000),
-				Classes: []TariffRootClass{
-					{
-						Class: 0,
-						Rate:  "8bit",
-						Ceil:  fmt.Sprintf("%dmbit", tps[i].InSpeed/1000),
-					},
-					{
-						Class: 1,
-						Rate:  "8bit",
-						Ceil:  fmt.Sprintf("%dmbit", tps[i].InSpeed/1000),
-					},
-				},
+				RootRate: fmt.Sprintf("%dkbit", tps[i].InSpeed),
+				RootCeil: fmt.Sprintf("%dkbit", tps[i].InSpeed),
 			},
 		})
-		for c := 2; c < 8; c++ {
+		for c := 0; c < 8; c++ {
 			tarifs[i].Outbound.Classes = append(tarifs[i].Outbound.Classes, TariffRootClass{
 				Class: c,
 				Rate:  "8bit",
-				Ceil:  fmt.Sprintf("%dmbit", tps[i].OutSpeed/1000),
+				Ceil:  fmt.Sprintf("%dkbit", tps[i].OutSpeed),
 			})
 			tarifs[i].Inbound.Classes = append(tarifs[i].Inbound.Classes, TariffRootClass{
 				Class: c,
 				Rate:  "8bit",
-				Ceil:  fmt.Sprintf("%dmbit", tps[i].InSpeed/1000),
+				Ceil:  fmt.Sprintf("%dkbit", tps[i].InSpeed),
 			})
 		}
 	}
