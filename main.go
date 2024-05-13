@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"strings"
 
 	"github.com/BurntSushi/toml"
 	"github.com/alexflint/go-arg"
@@ -57,7 +58,8 @@ func main() {
 		}
 		prfmap := make(map[string]scat.ScatUser)
 		for i := range prf {
-			u, ok := usermap[prf[i].ID]
+			uid := strings.Replace(prf[i].ID, "UID.", "", 1)
+			u, ok := usermap[uid]
 			if ok {
 				prf[i].IP = u.IP
 			}
@@ -85,7 +87,9 @@ func main() {
 			}
 			// fmt.Println("DEBUG", id, prfmap[fmt.Sprintf("UID.%s", id)], prfmap[fmt.Sprintf("UID.%s", id)].TPName, fmt.Sprintf("tssp.%d", u.TPID))
 			pr, ok := prfmap[fmt.Sprintf("UID.%s", id)]
-			if (ok && pr.TPName != fmt.Sprintf("tp.%d", u.TPID)) || !ok {
+			if (ok && pr.TPName != fmt.Sprintf("tp.%d", u.TPID)) ||
+				(ok && pr.IP != u.IP) ||
+				!ok {
 				_, err = app.Nases[i].Run(fmt.Sprintf("fdpi_ctrl load --policing --profile.name tp.%d --login UID.%s", u.TPID, u.UID))
 				if err != nil {
 					log.Print("Failed to parse output: " + err.Error())
