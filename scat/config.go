@@ -4,6 +4,7 @@ type Config struct {
 	AbillsDB      string      `toml:"db"`
 	AbillsBDNames string      `toml:"dbnames"`
 	NasKeyFile    string      `toml:"keyfile"`
+	DaemonMode    bool        `toml:"daemon"`
 	Nases         []ConfigNas `toml:"nases"`
 	SyncSpeed     bool        `toml:"-" flag:"syncspeed"`
 }
