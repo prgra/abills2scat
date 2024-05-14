@@ -104,7 +104,7 @@ func main() {
 					app.Nases[i].Run(fmt.Sprintf("fdpi_ctrl del --bind_multi --login %s", u.ID))
 				}
 			}
-			if time.Now().Hour() == lasthour {
+			if time.Now().Hour() != lasthour {
 				log.Println("Syncing Tariff Profiles")
 				tps, err := app.GetTarifsFromAbills()
 				if err != nil {
@@ -121,6 +121,7 @@ func main() {
 		if !args.DaemonMode {
 			break
 		}
+		log.Println("Sleeping 60 seconds")
 		lasthour = time.Now().Hour()
 		time.Sleep(60 * time.Second)
 	}
