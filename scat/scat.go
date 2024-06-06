@@ -185,6 +185,37 @@ func (n *Nas) GetUserProfilesList() (users []ScatUser, err error) {
 	return users, nil
 }
 
+// GetUserCGNat fdpi_ctrl list all --policing показывает список пользователей и их скорости
+func (n *Nas) GetUserCGNat() (users map[string]bool, err error) {
+	s, serr := n.SSH.NewSession()
+	if serr != nil {
+		return nil, serr
+	}
+	defer s.Close()
+	users = make(map[string]bool)
+	sshOut, _ := s.StdoutPipe()
+	sshErr, _ := s.StderrPipe()
+	err = s.Run("fdpi_ctrl list all --service 11")
+	if err != nil {
+		return nil, err
+	}
+	be, _ := io.ReadAll(sshErr)
+	if len(be) > 0 {
+		fmt.Println("GetUserCGNat", "ParseErr", string(be))
+	}
+	scanner := bufio.NewScanner(sshOut)
+	for scanner.Scan() {
+		a := scanner.Text()
+		strs := strings.Split(a, "\t")
+		if len(strs) < 2 {
+			continue
+		}
+		users[strs[0]] = true
+
+	}
+	return users, nil
+}
+
 func (a *App) AddTariff(in, out int) {
 
 }

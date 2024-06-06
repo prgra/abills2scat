@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"log"
+	"net"
 	"os"
 	"strings"
 	"time"
@@ -46,6 +47,10 @@ func main() {
 	lasthour := time.Now().Hour()
 	for {
 		for i := range app.Nases {
+			natusrs, err := app.Nases[i].GetUserCGNat()
+			if err != nil {
+				log.Println("Failed to NAT parse output: " + err.Error())
+			}
 			usrs, err := app.Nases[i].GetUserList()
 			if err != nil {
 				log.Println("Failed to parse output: " + err.Error())
@@ -85,16 +90,37 @@ func main() {
 			for id, u := range aumap {
 				if _, ok := usermap[id]; !ok {
 					app.Nases[i].Run(fmt.Sprintf("fdpi_ctrl load --bind_multi --user UID.%s:%s", u.UID, u.IP))
-					_ = id
 				}
 				// fmt.Println("DEBUG", id, prfmap[fmt.Sprintf("UID.%s", id)], prfmap[fmt.Sprintf("UID.%s", id)].TPName, fmt.Sprintf("tssp.%d", u.TPID))
 				pr, ok := prfmap[fmt.Sprintf("UID.%s", id)]
-				if (ok && pr.TPName != fmt.Sprintf("tp.%d", u.TPID)) ||
-					(ok && pr.IP != u.IP) ||
-					!ok {
+				if ok && pr.IP != u.IP {
+					_, err = app.Nases[i].Run(fmt.Sprintf("fdpi_ctrl del --bind_multi --ip %s", pr.IP))
+					if err != nil {
+						log.Print("Failed to parse output: " + err.Error())
+					}
+					_, err = app.Nases[i].Run(fmt.Sprintf("fdpi_ctrl load --bind_multi --user UID.%s:%s", u.UID, u.IP))
+					if err != nil {
+						log.Print("Failed to parse output: " + err.Error())
+					}
+				}
+				if (ok && pr.TPName != fmt.Sprintf("tp.%d", u.TPID)) || !ok {
 					_, err = app.Nases[i].Run(fmt.Sprintf("fdpi_ctrl load --policing --profile.name tp.%d --login UID.%s", u.TPID, u.UID))
 					if err != nil {
 						log.Print("Failed to parse output: " + err.Error())
+					}
+				}
+				isNated := natusrs[fmt.Sprintf("UID.%s", id)]
+				nip := net.ParseIP(u.IP)
+				if !isNated && nip.IsPrivate() {
+					_, err = app.Nases[i].Run(fmt.Sprintf("fdpi_ctrl load --service 11 --profile.name %s --login UID.%s", "CG-NAT", u.UID))
+					if err != nil {
+						log.Print("Failed to nat parse output: " + err.Error())
+					}
+				}
+				if isNated && !nip.IsPrivate() {
+					_, err = app.Nases[i].Run(fmt.Sprintf("fdpi_ctrl del --service 11 --login UID.%s", u.UID))
+					if err != nil {
+						log.Print("Failed to nat parse output: " + err.Error())
 					}
 				}
 			}
